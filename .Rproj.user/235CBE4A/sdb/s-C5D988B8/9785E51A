@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(shiny)\nlibrary(shinydashboard)\nlibrary(plotly)\nlibrary(stringi)\n\nload(\"./data/output/DtData.RData\")\nsource(\"./functions.R\")\n\n\nv_s_ges_choices <- c(\"Pública\", \"Privada\")\nbody <- dashboardBody(\n  fluidRow(\n    box(\n      height = \"500px\",\n      width = 10,\n      h3(\"Ingresos por carrera y costo de programa\"),\n      plotlyOutput(\"plot\")\n    ),\n    box(\n      height = \"100px\",\n      width = 2,\n      radioButtons(inputId = \"s_cost_type\", label = \"Prueba\",choices = c(\"min\", \"max\"))\n    ),\n    box(\n      height = \"100px\",\n      width = 2,\n      checkboxGroupInput(inputId = \"v_s_tipo_ges\", label = \"Tipo de gestión\", choices = v_s_ges_choices, selected = v_s_ges_choices)\n    ),\n    box(\n      height = \"100px\",\n      width = 2,\n      checkboxGroupInput(inputId = \"v_s_tipo_inst\", label = \"Tipo de instución\",\n                         choices = c(\"Universidad\",\"Instituto\") ,\n                         selected = \"Universidad\")\n    ),\n    box(\n      height = \"300px\",\n      width = 5,\n      uiOutput(\"select_inst\")\n    ),\n    box(\n      height = \"300px\",\n      width = 5,\n      uiOutput(\"select_car\")\n    ) \n    \n  )\n)\n\nui <- dashboardPage(\n  dashboardHeader(disable = TRUE),\n  dashboardSidebar(disable = TRUE),\n  body\n)\n\n# \n# ui <- fluidPage(\n#   plotlyOutput(\"plot\"),\n#   verbatimTextOutput(\"event\")\n# )\n\nserver <- function(input, output) {\n  \n  makeDataReactive <- reactive({makeData(dt_data, input)})\n  # renderPlotly() also understands ggplot2 objects!\n  output$plot <- renderPlotly({\n    makeCostIncomeGraph(makeDataReactive(), s_cost_type = input$s_cost_type)\n  })\n  output$select_inst <- renderUI({({\n      selectInputByDataCol(makeDataReactive(), \"institucion\", \"v_s_inst\", \"Institución\" )\n    }) \n  })\n  output$select_car <- renderUI({({\n     selectInputByDataCol(makeDataReactive(), \"carrera\", \"v_s_car\", \"Carrera\" )\n   }) \n })\n  \n}\n\nshinyApp(ui, server)",
+    "created" : 1491065695534.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1815465432",
+    "id" : "9785E51A",
+    "lastKnownWriteTime" : 1491087234,
+    "last_content_update" : 1491087234094,
+    "path" : "~/Documents/empleo/postulaciones/portfolio/salaryEducationTest/shinyApp/shiny.R",
+    "project_path" : "shiny.R",
+    "properties" : {
+        "marks" : "<:67,4\n>:67,4"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

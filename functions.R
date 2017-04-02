@@ -43,7 +43,6 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1
                            ingreso_promedio,
                            categoria,
                            text_detalle)]
-  
   dt_data <- dt_data[ ingreso_promedio > 0  ]
   
   if(s_cost_type == "min" ){
@@ -116,11 +115,8 @@ makeInstitutionIncomeGraph <- function(dt_data, v_s_institutions=NULL, s_color_p
 }
 
 
-selectInputByDataCol <- function(dt_data, s_col, s_input_id, s_label){
-  v_s_opt <- unique(dt_data[[s_col]])
-  v_s_opt <- v_s_opt[ order(v_s_opt)]
-  v_s_opt <- c("[Todas]",v_s_opt)
-  
+selectInputByDataCol <- function( v_s_opt, s_col, s_input_id, s_label){
+
   selectInput(inputId = s_input_id, label = s_label,
               choices = v_s_opt,
               selected = NULL,
@@ -132,11 +128,16 @@ makeData <- function(dt_data, input){
   dt_data <- dt_data[ ingreso_promedio > 0  ]
   
   # tipo_institucion
-  dt_data <- dt_data[ tolower(tipo_institucion) %in% tolower( stri_trans_general(input$v_s_tipo_inst,"Latin-ASCII"))  ]
+  v_s_tipo_inst <- input$v_s_tipo_inst
+  if(!is.null(v_s_tipo_inst)){
+    dt_data <- dt_data[ tolower(tipo_institucion) %in% tolower( stri_trans_general(input$v_s_tipo_inst,"Latin-ASCII"))  ]
+  }
   
   # tipo_gestion
-  dt_data <- dt_data[ tolower(tipo_gestion) %in% tolower( stri_trans_general(input$v_s_tipo_ges,"Latin-ASCII"))  ]
-  
+  v_s_tipo_ges <- input$v_s_tipo_ges
+  if(!is.null(v_s_tipo_ges)){
+    dt_data <- dt_data[ tolower(tipo_gestion) %in% tolower( stri_trans_general(input$v_s_tipo_ges,"Latin-ASCII"))  ]
+  }
   # institucion
   v_s_inst <- input$v_s_inst
   if(!is.null(v_s_inst)){

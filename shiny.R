@@ -37,12 +37,12 @@ body <- dashboardBody(
       height = "300px",
       width = 5,
       uiOutput("select_inst")
-    ),
-    box(
-      height = "300px",
-      width = 5,
-      uiOutput("select_car")
-    ) 
+    )#,
+    # box(
+    #   height = "300px",
+    #   width = 5,
+    #   uiOutput("select_car")
+    # ) 
     
   )
 )
@@ -66,14 +66,24 @@ server <- function(input, output) {
   output$plot <- renderPlotly({
     makeCostIncomeGraph(makeDataReactive(), s_cost_type = input$s_cost_type)
   })
+  
+  v_s_opt <- reactive({
+    dt_data_local <- makeDataReactive()
+    v_s_opt <- unique(dt_data_local[["institucion"]])
+    v_s_opt <- v_s_opt[ order(v_s_opt)]
+    v_s_opt <- c("[Todas]",v_s_opt)
+    v_s_opt
+  })
+  
+  
   output$select_inst <- renderUI({({
-      selectInputByDataCol(makeDataReactive(), "institucion", "v_s_inst", "Institución" )
+      selectInputByDataCol(v_s_opt(), "institucion", "v_s_inst", "Institución" )
     }) 
   })
-  output$select_car <- renderUI({({
-     selectInputByDataCol(makeDataReactive(), "carrera", "v_s_car", "Carrera" )
-   }) 
- })
+ #  output$select_car <- renderUI({isolate({
+ #     selectInputByDataCol(makeDataReactive(), "carrera", "v_s_car", "Carrera" )
+ #   }) 
+ # })
   
 }
 

@@ -1,4 +1,5 @@
 data/
 .DS_store
-.Rproj.user
+.Rproj.user/
+.Rhistory
 salaryEducationTest.Rproj

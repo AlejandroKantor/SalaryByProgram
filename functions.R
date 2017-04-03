@@ -115,8 +115,11 @@ makeInstitutionIncomeGraph <- function(dt_data, v_s_institutions=NULL, s_color_p
 }
 
 
-selectInputByDataCol <- function( v_s_opt, s_col, s_input_id, s_label){
-
+selectInputByDataCol <- function( dt_data, s_col, s_input_id, s_label){
+  v_s_opt <- unique(dt_data[[s_col]])
+  v_s_opt <- v_s_opt[ order(v_s_opt)]
+  v_s_opt <- c("[Todas]",v_s_opt)
+  v_s_opt
   selectInput(inputId = s_input_id, label = s_label,
               choices = v_s_opt,
               selected = NULL,
@@ -124,7 +127,7 @@ selectInputByDataCol <- function( v_s_opt, s_col, s_input_id, s_label){
   
 }
 
-makeData <- function(dt_data, input){
+makeDataInitial <- function(dt_data, input){
   dt_data <- dt_data[ ingreso_promedio > 0  ]
   
   # tipo_institucion
@@ -138,6 +141,16 @@ makeData <- function(dt_data, input){
   if(!is.null(v_s_tipo_ges)){
     dt_data <- dt_data[ tolower(tipo_gestion) %in% tolower( stri_trans_general(input$v_s_tipo_ges,"Latin-ASCII"))  ]
   }
+  
+  
+  return(dt_data)
+  
+  
+  
+}
+
+makeData <- function(dt_data, input){
+  
   # institucion
   v_s_inst <- input$v_s_inst
   if(!is.null(v_s_inst)){
@@ -146,14 +159,14 @@ makeData <- function(dt_data, input){
     }
   }
   
-  # # carrera
-  # v_s_car <- input$v_s_car
-  # if(!is.null(v_s_car)){
-  #   if(! "[Todas]" %in% v_s_car){
-  #     dt_data <- dt_data[ institucion %in% v_s_car  ]
-  #   }
-  # }
-  
+  # carrera
+  v_s_car <- input$v_s_car
+  if(!is.null(v_s_car)){
+    if(! "[Todas]" %in% v_s_car){
+      dt_data <- dt_data[ carrera %in% v_s_car  ]
+    }
+  }
+
   
   return(dt_data)
   

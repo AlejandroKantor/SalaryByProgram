@@ -19,7 +19,11 @@ makePonteEncarreraETL <- function( s_path_data, s_path_family, s_path_color, b_s
   dt_data[ is.na(rango_costo ) & tipo_gestion == "PUBLICA" , rango_costo :="0"]
   dt_data[ , costo_min:= as.numeric( gsub("-.*$","" , gsub(",","",rango_costo ) ))]
   dt_data[ , costo_max:= as.numeric( gsub("^.*-","" ,gsub(",","",rango_costo )  ) )]
-  dt_data[ , text_detalle := paste0(institucion , '<br>',carrera) ]
+  dt_data[ , text_detalle := paste0(institucion , '<br>',
+                                    carrera, '<br>',
+                                    "Rango costo: ",prettyNum(rango_costo, ","), '<br>',
+                                    "Ingreso promedio: ", prettyNum(ingreso_promedio, big.mark = ",")
+                                    ) ]
   
   dt_data <- merge(dt_data, dt_fam, all.x=TRUE, by= "familia_carrera")
   dt_data <- merge(dt_data, dt_color, all.x=TRUE, by= "categoria")
@@ -63,10 +67,11 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1
   i_num_categories <- dt_data[, length(unique(categoria))]
   
   p_costo_ingreso <- plot_ly(data = dt_data, 
+                             type = "scatter",
                              x = ~costo, 
                              y = ~ingreso_promedio, 
                              mode = "markers", 
-                             color = ~I(color),#~factor(categoria),
+                             color = ~I(color),
                              split = ~factor(categoria),
                              text = ~text_detalle,
                              hoverinfo = "text")

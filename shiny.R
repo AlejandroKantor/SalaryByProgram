@@ -53,28 +53,30 @@ ui <- dashboardPage(
   body
 )
 
-# 
-# ui <- fluidPage(
-#   plotlyOutput("plot"),
-#   verbatimTextOutput("event")
-# )
 
 server <- function(input, output) {
   
-  makeDataReactive <- reactive({makeData(dt_data, input)})
-  makeDataInitialReactive <- reactive({makeDataInitial(dt_data, input)})
-  # renderPlotly() also understands ggplot2 objects!
+  getDataWithTypeFilter <- reactive({filterTypes(dt_data, input)})
+ 
+  getDataWithTypeAndInstFilter <- reactive({
+    filterSpecific(getDataWithTypeFilter(), input$v_s_inst, "institucion")
+  })
+  getDataFullFilters <- reactive({
+    filterSpecific(getDataWithTypeAndInstFilter(), input$v_s_car, "carrera")
+  })
+  
+  
   output$plot <- renderPlotly({
-    makeCostIncomeGraph(makeDataReactive(), s_cost_type = input$s_cost_type)
+    makeCostIncomeGraph(getDataFullFilters(), s_cost_type = input$s_cost_type)
   })
   
  
   output$select_inst <- renderUI({({
-      selectInputByDataCol(makeDataInitialReactive(), "institucion", "v_s_inst", "Institución" )
+      selectInputByDataCol(getDataWithTypeFilter(), "institucion", "v_s_inst", "Institución" )
     }) 
   })
-  output$select_car <- renderUI({isolate({
-     selectInputByDataCol(makeDataInitialReactive(), "carrera", "v_s_car", "Carrera" )
+  output$select_car <- renderUI({({
+     selectInputByDataCol(getDataWithTypeAndInstFilter(), "carrera", "v_s_car", "Carrera" )
    })
  })
   

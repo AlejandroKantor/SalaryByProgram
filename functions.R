@@ -17,7 +17,7 @@ makePonteEncarreraETL <- function( s_path_data, s_path_family, b_save_result=FAL
   dt_data[ is.na(rango_costo ) & tipo_gestion == "PUBLICA" , rango_costo :="0"]
   dt_data[ , costo_min:= as.numeric( gsub("-.*$","" , gsub(",","",rango_costo ) ))]
   dt_data[ , costo_max:= as.numeric( gsub("^.*-","" ,gsub(",","",rango_costo )  ) )]
-  dt_data[ , text_detalle := paste0(institucion , '<br>',familia_carrera) ]
+  dt_data[ , text_detalle := paste0(institucion , '<br>',carrera) ]
   
   dt_data <- merge(dt_data, dt_fam, all.x=T, by= "familia_carrera")
   if(b_save_result == T){
@@ -118,7 +118,6 @@ makeInstitutionIncomeGraph <- function(dt_data, v_s_institutions=NULL, s_color_p
 selectInputByDataCol <- function( dt_data, s_col, s_input_id, s_label){
   v_s_opt <- unique(dt_data[[s_col]])
   v_s_opt <- v_s_opt[ order(v_s_opt)]
-  v_s_opt <- c("[Todas]",v_s_opt)
   v_s_opt
   selectInput(inputId = s_input_id, label = s_label,
               choices = v_s_opt,
@@ -127,7 +126,7 @@ selectInputByDataCol <- function( dt_data, s_col, s_input_id, s_label){
   
 }
 
-makeDataInitial <- function(dt_data, input){
+filterTypes <- function(dt_data, input){
   dt_data <- dt_data[ ingreso_promedio > 0  ]
   
   # tipo_institucion
@@ -149,27 +148,16 @@ makeDataInitial <- function(dt_data, input){
   
 }
 
-makeData <- function(dt_data, input){
-  
-  # institucion
-  v_s_inst <- input$v_s_inst
-  if(!is.null(v_s_inst)){
-    if(! "[Todas]" %in% v_s_inst){
-      dt_data <- dt_data[ institucion %in% v_s_inst  ]
-    }
-  }
-  
-  # carrera
-  v_s_car <- input$v_s_car
-  if(!is.null(v_s_car)){
-    if(! "[Todas]" %in% v_s_car){
-      dt_data <- dt_data[ carrera %in% v_s_car  ]
-    }
-  }
 
+filterSpecific <- function(dt_data, v_values, s_col){
+  
+  if(!is.null(v_values)){
+    dt_data <- dt_data[ dt_data[[s_col]] %in% v_values  ]
+  }
   
   return(dt_data)
   
-   
+  
   
 }
+

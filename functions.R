@@ -1,10 +1,12 @@
+library(data.table)
+library(RColorBrewer)
+library(plotly)
 
-
-makePonteEncarreraETL <- function( s_path_data, s_path_family, b_save_result=FALSE){
-  library(data.table)
+makePonteEncarreraETL <- function( s_path_data, s_path_family, s_path_color, b_save_result=FALSE){
   
   dt_data <- fread(s_path_data,na.strings = c("","ND"))
   dt_fam <- fread(s_path_family,na.strings = c("","ND"))
+  dt_color <- fread(s_path_color)
 
   
   v_new_names = c("familia_carrera", "carrera", "institucion", "ubicacion", "tipo_institucion" , "tipo_gestion", 
@@ -19,8 +21,10 @@ makePonteEncarreraETL <- function( s_path_data, s_path_family, b_save_result=FAL
   dt_data[ , costo_max:= as.numeric( gsub("^.*-","" ,gsub(",","",rango_costo )  ) )]
   dt_data[ , text_detalle := paste0(institucion , '<br>',carrera) ]
   
-  dt_data <- merge(dt_data, dt_fam, all.x=T, by= "familia_carrera")
-  if(b_save_result == T){
+  dt_data <- merge(dt_data, dt_fam, all.x=TRUE, by= "familia_carrera")
+  dt_data <- merge(dt_data, dt_color, all.x=TRUE, by= "categoria")
+  
+  if(b_save_result == TRUE){
     save(file= "./data/output/DtData.RData",  dt_data)
     message("Data saved in ./data/output/DtData.RData")
   }
@@ -31,9 +35,7 @@ makePonteEncarreraETL <- function( s_path_data, s_path_family, b_save_result=FAL
 
 
 makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1"){
-  library(data.table)
-  library(RColorBrewer)
-  library(plotly)
+
   dt_data <- dt_data[ , .( costo_min,
                            costo_max, 
                            institucion, 
@@ -42,8 +44,8 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1
                            tipo_gestion,
                            ingreso_promedio,
                            categoria,
-                           text_detalle)]
-  dt_data <- dt_data[ ingreso_promedio > 0  ]
+                           text_detalle,
+                           color)]
   
   if(s_cost_type == "min" ){
     dt_data[ , costo :=  costo_min ]
@@ -64,23 +66,27 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1
                              x = ~costo, 
                              y = ~ingreso_promedio, 
                              mode = "markers", 
-                             color = ~factor(categoria),
+                             color = ~I(color),#~factor(categoria),
+                             split = ~factor(categoria),
                              text = ~text_detalle,
-                             hoverinfo = "text",
-                             colors  = brewer.pal(i_num_categories,s_color_pal))
+                             hoverinfo = "text")
   p_costo_ingreso <- p_costo_ingreso %>% layout( xaxis = list(  title = s_x_axis, rangemode="tozero"),
                                                  yaxis = list(  title = "Ingreso promedio", rangemode="tozero"),
                                                  legend= list( bgcolor= "#F0F0F0"),
-                                                 hovermode='closest'#,
-                                                 #margin= list(l=90, r=80, t=40, b=50),
-                                                 #plot_bgcolor= "#fdfdfd",
-                                                 #paper_bgcolor  ="#fdfdfd"
+                                                 hovermode='closest'
                                                  )
   
   
   return(p_costo_ingreso)
 }
 
+seperateData <- function(dt_data){
+  l_data <- list()
+  l_data[["dt_with_income_cost"]] <- dt_data[ !( is.na(ingreso_promedio)  | is.na(costo_min))]
+  
+  l_data[["dt_with_missing"]] <- dt_data[  is.na(ingreso_promedio)  | is.na(costo_min)]
+  return(l_data)
+}
 
 selectInputByDataCol <- function( dt_data, s_col, s_input_id, s_label){
   v_s_opt <- unique(dt_data[[s_col]])
@@ -94,7 +100,6 @@ selectInputByDataCol <- function( dt_data, s_col, s_input_id, s_label){
 }
 
 filterTypes <- function(dt_data, input){
-  dt_data <- dt_data[ ingreso_promedio > 0  ]
   
   # tipo_institucion
   v_s_tipo_inst <- input$v_s_tipo_inst

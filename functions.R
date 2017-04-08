@@ -80,40 +80,6 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1
   return(p_costo_ingreso)
 }
 
-makeInstitutionIncomeGraph <- function(dt_data, v_s_institutions=NULL, s_color_pal= "Set1"){
-  library(data.table)
-  library(RColorBrewer)
-  library(plotly)
-  dt_data <- dt_data[ , .( institucion, 
-                           familia_carrera,
-                           tipo_institucion, 
-                           tipo_gestion,
-                           ingreso_promedio,
-                           categoria,
-                           text_detalle)]
-  
-  dt_data <- dt_data[ institucion %in%  v_s_institutions &
-                      ingreso_promedio > 0  ]
-  
-  i_num_categories <- dt_data[, length(unique(categoria))]
-  p_institu_ingreso <- plot_ly(data = dt_data, 
-                             x = institucion, 
-                             y = ingreso_promedio, 
-                             mode = "markers", 
-                             color = factor(categoria),
-                             text = text_detalle,
-                             hoverinfo = "text",
-                             colors  = brewer.pal(i_num_categories,s_color_pal))
-  p_institu_ingreso <- p_institu_ingreso %>% layout( xaxis = list(  title = "Institución"),
-                                                 yaxis = list(  title = "Ingreso Promedio", rangemode="tozero"),
-                                                 legend= list( bgcolor= "#F0F0F0"),
-                                                 hovermode='closest',
-                                                 margin= list(l=90, r=80, t=40, b=50),
-                                                 plot_bgcolor= "#fdfdfd",
-                                                 paper_bgcolor  ="#fdfdfd" )
-  return(p_institu_ingreso)
-}
-
 
 selectInputByDataCol <- function( dt_data, s_col, s_input_id, s_label){
   v_s_opt <- unique(dt_data[[s_col]])

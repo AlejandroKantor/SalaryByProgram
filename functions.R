@@ -71,10 +71,11 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1
   p_costo_ingreso <- p_costo_ingreso %>% layout( xaxis = list(  title = s_x_axis, rangemode="tozero"),
                                                  yaxis = list(  title = "Ingreso promedio", rangemode="tozero"),
                                                  legend= list( bgcolor= "#F0F0F0"),
-                                                 hovermode='closest',
-                                                 margin= list(l=90, r=80, t=40, b=50),
-                                                 plot_bgcolor= "#fdfdfd",
-                                                 paper_bgcolor  ="#fdfdfd" )
+                                                 hovermode='closest'#,
+                                                 #margin= list(l=90, r=80, t=40, b=50),
+                                                 #plot_bgcolor= "#fdfdfd",
+                                                 #paper_bgcolor  ="#fdfdfd"
+                                                 )
   
   
   return(p_costo_ingreso)

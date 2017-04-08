@@ -19,7 +19,7 @@ body <- dashboardBody(
     box(
       height = "100px",
       width = 2,
-      radioButtons(inputId = "s_cost_type", label = "Prueba",choices = c("min", "max"))
+      radioButtons(inputId = "s_cost_type", label = "Costo",choices = c("min", "max"))
     ),
     box(
       height = "100px",

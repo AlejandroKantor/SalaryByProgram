@@ -13,7 +13,7 @@ body <- dashboardBody(
     box(
       height = "500px",
       width = 10,
-      h3("Ingresos por carrera y costo de programa"),
+      h3("Ingresos por carrera y costo"),
       plotlyOutput("plot")
     ),
     box(
@@ -56,8 +56,11 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
   
-  getDataWithTypeFilter <- reactive({filterTypes(dt_data, input)})
- 
+  l_data <- seperateData(dt_data)
+  dt_with_income_cost <- l_data[["dt_with_income_cost"]]
+  dt_with_missing <- l_data[["dt_with_missing"]]
+  getDataWithTypeFilter <- reactive({filterTypes(dt_with_income_cost, input)})
+  
   getDataWithTypeAndInstFilter <- reactive({
     filterSpecific(getDataWithTypeFilter(), input$v_s_inst, "institucion")
   })
@@ -70,15 +73,13 @@ server <- function(input, output) {
     makeCostIncomeGraph(getDataFullFilters(), s_cost_type = input$s_cost_type)
   })
   
- 
-  output$select_inst <- renderUI({({
-      selectInputByDataCol(getDataWithTypeFilter(), "institucion", "v_s_inst", "Institución" )
-    }) 
+  
+  output$select_inst <- renderUI({
+    selectInputByDataCol(getDataWithTypeFilter(), "institucion", "v_s_inst", "Institución" )
   })
-  output$select_car <- renderUI({({
-     selectInputByDataCol(getDataWithTypeAndInstFilter(), "carrera", "v_s_car", "Carrera" )
-   })
- })
+  output$select_car <- renderUI({
+    selectInputByDataCol(getDataWithTypeAndInstFilter(), "carrera", "v_s_car", "Carrera" )
+  })
   
 }
 

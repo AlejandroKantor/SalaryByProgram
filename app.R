@@ -13,7 +13,7 @@ body <- dashboardBody(
     box(
       height = "500px",
       width = 10,
-      h3("Ingresos por carrera y costo"),
+      h3("Ingreso mensual por carrera y costo"),
       plotlyOutput("plot")
     ),
     box(

@@ -7,7 +7,7 @@ makePonteEncarreraETL <- function( s_path_data, s_path_family, s_path_color, b_s
   dt_data <- fread(s_path_data,na.strings = c("","ND"))
   dt_fam <- fread(s_path_family,na.strings = c("","ND"))
   dt_color <- fread(s_path_color)
-
+  
   
   v_new_names = c("familia_carrera", "carrera", "institucion", "ubicacion", "tipo_institucion" , "tipo_gestion", 
                   "duracion", "rango_costo", "porc_ingresantes", "ingreso_promedio", "credito_universitario", 
@@ -23,7 +23,7 @@ makePonteEncarreraETL <- function( s_path_data, s_path_family, s_path_color, b_s
                                     carrera, '<br>',
                                     "Rango costo: ",prettyNum(rango_costo, ","), '<br>',
                                     "Ingreso promedio: ", prettyNum(ingreso_promedio, big.mark = ",")
-                                    ) ]
+  ) ]
   
   dt_data <- merge(dt_data, dt_fam, all.x=TRUE, by= "familia_carrera")
   dt_data <- merge(dt_data, dt_color, all.x=TRUE, by= "categoria")
@@ -38,8 +38,8 @@ makePonteEncarreraETL <- function( s_path_data, s_path_family, s_path_color, b_s
 }
 
 
-makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1"){
-
+makeCostIncomeGraph <- function(dt_data, s_cost_type = "min"){
+  
   dt_data <- dt_data[ , .( costo_min,
                            costo_max, 
                            institucion, 
@@ -77,19 +77,30 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min", s_color_pal= "Set1
                              hoverinfo = "text")
   p_costo_ingreso <- p_costo_ingreso %>% layout( xaxis = list(  title = s_x_axis, rangemode="tozero"),
                                                  yaxis = list(  title = "Ingreso promedio", rangemode="tozero"),
-                                                 legend= list( bgcolor= "#F0F0F0"),
+                                                 #legend= list( bgcolor= "#F0F0F0"),
+                                                 legend = list(orientation = 'h'),
                                                  hovermode='closest'
-                                                 )
+  )
   
   
-  return(p_costo_ingreso)
+  return(p_costo_ingreso) 
 }
 
 seperateData <- function(dt_data){
   l_data <- list()
   l_data[["dt_with_income_cost"]] <- dt_data[ !( is.na(ingreso_promedio)  | is.na(costo_min))]
   
-  l_data[["dt_with_missing"]] <- dt_data[  is.na(ingreso_promedio)  | is.na(costo_min)]
+  v_s_cols <- c( "carrera", "institucion", "tipo_institucion","tipo_gestion","rango_costo","ingreso_promedio")
+  v_s_new_cols <- c( "Carrera", "Institución", "Tipo institución", "Tipo gestión", "Rango costo", "Ingreso promedio") 
+  dt_with_missing <- dt_data[  is.na(ingreso_promedio)  | is.na(costo_min), v_s_cols, with = FALSE]
+  dt_with_missing[ , rango_costo := prettyNum(rango_costo, big.mark = ",")]
+  dt_with_missing[ grep("^\\s*NA$",rango_costo), rango_costo := ""]
+  
+  dt_with_missing[ , ingreso_promedio := prettyNum(ingreso_promedio, big.mark = ",")]
+  dt_with_missing[ grep("^\\s*NA$",ingreso_promedio), ingreso_promedio := ""]
+  #setnames(dt_with_missing, v_s_new_cols)
+  
+  l_data[["dt_with_missing"]] <- dt_with_missing
   return(l_data)
 }
 
@@ -138,3 +149,38 @@ filterSpecific <- function(dt_data, v_values, s_col){
   
 }
 
+dataWithMissingToDatatable <- function(dt_with_missing_filt){
+  # dt_with_missing_filt <- filterSpecific(dt_with_missing_filt, input$v_s_inst, "institucion")
+  # dt_with_missing_filt <- filterSpecific(dt_with_missing_filt, input$v_s_inst, "carrera")
+  dt_with_missing_filt[ tipo_institucion == "UNIVERSIDAD",  tipo_institucion := "Universidad"] 
+  dt_with_missing_filt[ tipo_institucion == "INSTITUTO",  tipo_institucion := "Instituto"] 
+  dt_with_missing_filt[ tipo_gestion == "PUBLICA",  tipo_gestion := "Pública"] 
+  dt_with_missing_filt[ tipo_gestion == "PRIVADA",  tipo_gestion := "Privada"] 
+  
+  v_s_cols <- c( "carrera", "institucion", "tipo_institucion","tipo_gestion","rango_costo","ingreso_promedio")
+  v_s_new_cols <- c( "Carrera", "Institución", "Tipo institución", "Tipo gestión", "Rango costo", "Ingreso promedio") 
+  setnames(dt_with_missing_filt, v_s_cols, v_s_new_cols)
+  return(dt_with_missing_filt)
+}
+
+getDataTableOptions <- function(){
+  
+  l_paginate <- list(first = "Primero" ,
+                     last= "Último",
+                     s_next = "Siguiente",
+                     previous = "Anterior"
+  )
+  names(l_paginate)[ names(l_paginate) == "s_next"] <-  "next"
+  
+  l_dattab_options <- list(pageLength=10, 
+                           language = list(info = "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                                           emptyTable = "Ningún dato disponible en esta tabla", 
+                                           search = "Buscar:",
+                                           infoEmpty = "Mostrando registros del 0 al 0 de un total de 0 registros",
+                                           lengthMenu = "Mostrar _MENU_ registros",
+                                           paginate = l_paginate
+                           ) 
+  )
+  
+  return(l_dattab_options)
+}

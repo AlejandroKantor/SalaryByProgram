@@ -2,6 +2,7 @@ library(shiny)
 library(shinydashboard)
 library(plotly)
 library(stringi)
+library(shinyBS)
 
 load("./data/output/DtData.RData")
 source("./functions.R")
@@ -34,6 +35,12 @@ body <- dashboardBody(
                          selected = "Universidad")
     ),
     box(
+      height = "100px",
+      width = 10,
+      h4("Carreras sin ingreso promedio o costo"),
+      actionButton("tabBut", "Ver casos")
+    ),
+    box(
       height = "300px",
       width = 5,
       uiOutput("select_inst")
@@ -42,8 +49,10 @@ body <- dashboardBody(
       height = "300px",
       width = 5,
       uiOutput("select_car")
-    )
-    
+    ),
+    bsModal("missingTable", "Carreras sin ingreso promedio o costo", "tabBut", size = "large",
+            dataTableOutput("missing_table"))
+
   )
 )
 
@@ -81,6 +90,14 @@ server <- function(input, output) {
     selectInputByDataCol(getDataWithTypeAndInstFilter(), "carrera", "v_s_car", "Carrera" )
   })
   
+  
+  
+  output$missing_table <- renderDataTable({
+    dt_with_missing_filt <- dataWithMissingToDatatable( dt_with_missing_filt = filterTypes(dt_with_missing, input))
+    
+    return(dt_with_missing_filt)
+  }, options = getDataTableOptions())
+    
 }
 
 shinyApp(ui, server)

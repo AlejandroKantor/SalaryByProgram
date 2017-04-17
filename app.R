@@ -6,52 +6,54 @@ library(shinyBS)
 
 load("./data/output/DtData.RData")
 source("./functions.R")
-
-
 v_s_ges_choices <- c("Pública", "Privada")
 body <- dashboardBody(
   fluidRow(
-    box(
-      height = "500px",
-      width = 10,
-      h3("Ingreso mensual por carrera y costo"),
-      plotlyOutput("plot")
+    column( width = 8,
+            box(
+              height = "500px",
+              width = NULL,
+              h3("Ingreso mensual por carrera y costo"),
+              plotlyOutput("plot") 
+            ),  
+            box(
+              width = NULL,
+              column( width = 4, 
+                      radioButtons(inputId = "s_cost_type", label = "Costo",choices = c("min", "max"))),
+              column( width = 4,  
+                      checkboxGroupInput(inputId = "v_s_tipo_ges", label = "Tipo de gestión" ,
+                                                     choices = v_s_ges_choices, selected = v_s_ges_choices)),
+              column( width = 4,       
+                      checkboxGroupInput(inputId = "v_s_tipo_inst", 
+                                                          label = "Tipo de instución",
+                                                          choices = c("Universidad","Instituto"),
+                                                          selected = "Universidad")
+                      )
+              
+            )
+            
     ),
+    
     box(
-      height = "100px",
-      width = 2,
-      radioButtons(inputId = "s_cost_type", label = "Costo",choices = c("min", "max"))
-    ),
-    box(
-      height = "100px",
-      width = 2,
-      checkboxGroupInput(inputId = "v_s_tipo_ges", label = "Tipo de gestión", choices = v_s_ges_choices, selected = v_s_ges_choices)
-    ),
-    box(
-      height = "100px",
-      width = 2,
-      checkboxGroupInput(inputId = "v_s_tipo_inst", label = "Tipo de instución",
-                         choices = c("Universidad","Instituto") ,
-                         selected = "Universidad")
-    ),
-    box(
-      height = "100px",
-      width = 10,
+      width = 4,
       h4("Carreras sin ingreso promedio o costo"),
-      actionButton("tabBut", "Ver casos")
-    ),
-    box(
-      height = "300px",
-      width = 5,
-      uiOutput("select_inst")
-    ),
-    box(
-      height = "300px",
-      width = 5,
+      actionButton("tabBut", "Ver casos"),
+      br(),
+      br(),
+      uiOutput("select_inst"),
       uiOutput("select_car")
+    )
+    ,
+    box(
+      width = 4,
+      h4("Fuentes y definiciones"),
+      actionButton("fuentDef", "Ver fuentes y definiciones")
     ),
+ 
     bsModal("missingTable", "Carreras sin ingreso promedio o costo", "tabBut", size = "large",
-            dataTableOutput("missing_table"))
+            dataTableOutput("missing_table")),
+    bsModal("fuenteDefiniciones", "Fuentes y definiciones", "fuentDef", size = "large",
+            p("Información de fuentes"))
 
   )
 )
@@ -93,7 +95,7 @@ server <- function(input, output) {
   
   
   output$missing_table <- renderDataTable({
-    dt_with_missing_filt <- dataWithMissingToDatatable( dt_with_missing_filt = filterTypes(dt_with_missing, input))
+    dt_with_missing_filt <- dataWithMissingToDatatable( dt_with_missing)
     
     return(dt_with_missing_filt)
   }, options = getDataTableOptions())

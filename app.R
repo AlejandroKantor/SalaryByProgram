@@ -1,3 +1,5 @@
+library(data.table)
+library(RColorBrewer)
 library(shiny)
 library(shinydashboard)
 library(plotly)

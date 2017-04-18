@@ -1,6 +1,3 @@
-library(data.table)
-library(RColorBrewer)
-library(plotly)
 
 makePonteEncarreraETL <- function( s_path_data, s_path_family, s_path_color, b_save_result=FALSE){
   

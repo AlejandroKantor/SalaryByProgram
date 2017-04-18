@@ -91,16 +91,14 @@ seperateData <- function(dt_data){
   l_data[["dt_with_income_cost"]] <- dt_data[ !( is.na(ingreso_promedio)  | is.na(costo_min))]
   
   v_s_cols <- c( "carrera", "institucion", "tipo_institucion","tipo_gestion","rango_costo","ingreso_promedio")
-  v_s_new_cols <- c( "Carrera", "Institución", "Tipo institución", "Tipo gestión", "Rango costo", "Ingreso promedio") 
-  dt_with_missing <- dt_data[  is.na(ingreso_promedio)  | is.na(costo_min), v_s_cols, with = FALSE]
-  dt_with_missing[ , rango_costo := prettyNum(rango_costo, big.mark = ",")]
-  dt_with_missing[ grep("^\\s*NA$",rango_costo), rango_costo := ""]
+  dt_data <- dt_data[ , v_s_cols, with = FALSE]
+  dt_data[ , rango_costo := prettyNum(rango_costo, big.mark = ",")]
+  dt_data[ grep("^\\s*NA$",rango_costo), rango_costo := ""]
   
-  dt_with_missing[ , ingreso_promedio := prettyNum(ingreso_promedio, big.mark = ",")]
-  dt_with_missing[ grep("^\\s*NA$",ingreso_promedio), ingreso_promedio := ""]
-  #setnames(dt_with_missing, v_s_new_cols)
+  dt_data[ , ingreso_promedio := prettyNum(ingreso_promedio, big.mark = ",")]
+  dt_data[ grep("^\\s*NA$",ingreso_promedio), ingreso_promedio := ""]
   
-  l_data[["dt_with_missing"]] <- dt_with_missing
+  l_data[["dt_data"]] <- dt_data
   return(l_data)
 }
 
@@ -149,18 +147,17 @@ filterSpecific <- function(dt_data, v_values, s_col){
   
 }
 
-dataWithMissingToDatatable <- function(dt_with_missing_filt){
-  # dt_with_missing_filt <- filterSpecific(dt_with_missing_filt, input$v_s_inst, "institucion")
-  # dt_with_missing_filt <- filterSpecific(dt_with_missing_filt, input$v_s_inst, "carrera")
-  dt_with_missing_filt[ tipo_institucion == "UNIVERSIDAD",  tipo_institucion := "Universidad"] 
-  dt_with_missing_filt[ tipo_institucion == "INSTITUTO",  tipo_institucion := "Instituto"] 
-  dt_with_missing_filt[ tipo_gestion == "PUBLICA",  tipo_gestion := "Pública"] 
-  dt_with_missing_filt[ tipo_gestion == "PRIVADA",  tipo_gestion := "Privada"] 
+dataWithMissingToDatatable <- function(dt_data){
+  dt_data_local <- copy(dt_data)
+  dt_data_local[ tipo_institucion == "UNIVERSIDAD",  tipo_institucion := "Universidad"] 
+  dt_data_local[ tipo_institucion == "INSTITUTO",  tipo_institucion := "Instituto"] 
+  dt_data_local[ tipo_gestion == "PUBLICA",  tipo_gestion := "Pública"] 
+  dt_data_local[ tipo_gestion == "PRIVADA",  tipo_gestion := "Privada"] 
   
   v_s_cols <- c( "carrera", "institucion", "tipo_institucion","tipo_gestion","rango_costo","ingreso_promedio")
   v_s_new_cols <- c( "Carrera", "Institución", "Tipo institución", "Tipo gestión", "Rango costo", "Ingreso promedio") 
-  setnames(dt_with_missing_filt, v_s_cols, v_s_new_cols)
-  return(dt_with_missing_filt)
+  setnames(dt_data_local, v_s_cols, v_s_new_cols)
+  return(dt_data_local)
 }
 
 getDataTableOptions <- function(){

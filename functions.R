@@ -1,3 +1,17 @@
+correctLocationNames <- function(v_s_location){
+  l_names <- list( "Ancash" = "Áncash", 
+                   "Apurimac" = "Apurímac" , 
+                   "Huanuco" = "Huánuco",
+                   "Junin" = "Junín", 
+                   "San Martin", "San Martín"
+  )
+  v_s_names <- names(l_names)
+  for(s_name in v_s_names){
+    s_correction <- l_names[[s_name]]
+    v_s_location[ v_s_location == s_name] <- s_correction
+  }
+  return(v_s_location)
+}
 
 makePonteEncarreraETL <- function( s_path_data, s_path_family, s_path_color, b_save_result=FALSE){
   
@@ -12,14 +26,15 @@ makePonteEncarreraETL <- function( s_path_data, s_path_family, s_path_color, b_s
   setnames(dt_data, v_new_names)
   
   dt_data[ , ingreso_promedio := as.numeric(ingreso_promedio)]
+  dt_data[ , ubicacion := correctLocationNames(ubicacion)]
   
   dt_data[ is.na(rango_costo ) & tipo_gestion == "PUBLICA" , rango_costo :="0"]
   dt_data[ , costo_min:= as.numeric( gsub("-.*$","" , gsub(",","",rango_costo ) ))]
   dt_data[ , costo_max:= as.numeric( gsub("^.*-","" ,gsub(",","",rango_costo )  ) )]
-  dt_data[ , text_detalle := paste0(institucion , '<br>',
+  dt_data[ , text_detalle := paste0(institucion ," (",ubicacion,")",  '<br>',
                                     carrera, '<br>',
-                                    "Rango costo: ",prettyNum(rango_costo, ","), '<br>',
-                                    "Ingreso promedio: ", prettyNum(ingreso_promedio, big.mark = ",")
+                                    "Rango costo: ",prettyNum(rango_costo, ",", preserve.width = "none"), '<br>',
+                                    "Ingreso promedio: ", prettyNum(ingreso_promedio, big.mark = ",", preserve.width = "none")
   ) ]
   
   dt_data <- merge(dt_data, dt_fam, all.x=TRUE, by= "familia_carrera")
@@ -61,7 +76,6 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min"){
     stop( "s_cost_type must be one of the following: 'max', 'min', 'mid range'")
   }
   
-  i_num_categories <- dt_data[, length(unique(categoria))]
   
   p_costo_ingreso <- plot_ly(data = dt_data, 
                              type = "scatter",
@@ -74,10 +88,10 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min"){
                              hoverinfo = "text")
   p_costo_ingreso <- p_costo_ingreso %>% layout( xaxis = list(  title = s_x_axis, rangemode="tozero"),
                                                  yaxis = list(  title = "Ingreso promedio", rangemode="tozero"),
-                                                 #legend= list( bgcolor= "#F0F0F0"),
-                                                 legend = list(orientation = 'h'),
+                                                   legend = list(y = -0.3, orientation = 'h'),
                                                  hovermode='closest'
   )
+  p_costo_ingreso
   
   
   return(p_costo_ingreso) 
@@ -87,9 +101,9 @@ seperateData <- function(dt_data){
   l_data <- list()
   l_data[["dt_with_income_cost"]] <- dt_data[ !( is.na(ingreso_promedio)  | is.na(costo_min))]
   
-  v_s_cols <- c( "carrera", "institucion", "tipo_institucion","tipo_gestion","rango_costo","ingreso_promedio")
+  v_s_cols <- c(  "institucion", "carrera","ubicacion", "tipo_institucion","tipo_gestion","rango_costo","ingreso_promedio")
   dt_data <- dt_data[ , v_s_cols, with = FALSE]
-  dt_data[ , rango_costo := prettyNum(rango_costo, big.mark = ",")]
+  dt_data[ , rango_costo := prettyNum(rango_costo, big.mark = ",", preserve.width = "none")]
   dt_data[ grep("^\\s*NA$",rango_costo), rango_costo := ""]
   
   dt_data[ , ingreso_promedio := prettyNum(ingreso_promedio, big.mark = ",")]
@@ -115,16 +129,20 @@ filterTypes <- function(dt_data, input){
   # tipo_institucion
   v_s_tipo_inst <- input$v_s_tipo_inst
   if(!is.null(v_s_tipo_inst)){
-    dt_data <- dt_data[ tolower(tipo_institucion) %in% tolower( stri_trans_general(input$v_s_tipo_inst,"Latin-ASCII"))  ]
+    dt_data <- dt_data[ tolower(tipo_institucion) %in% tolower( stri_trans_general(v_s_tipo_inst,"Latin-ASCII"))  ]
   }
   
   # tipo_gestion
   v_s_tipo_ges <- input$v_s_tipo_ges
   if(!is.null(v_s_tipo_ges)){
-    dt_data <- dt_data[ tolower(tipo_gestion) %in% tolower( stri_trans_general(input$v_s_tipo_ges,"Latin-ASCII"))  ]
+    dt_data <- dt_data[ tolower(tipo_gestion) %in% tolower( stri_trans_general(v_s_tipo_ges,"Latin-ASCII"))  ]
   }
   
-  
+  # ubicacion 
+  v_s_ubicacion <- input$v_s_ubicacion
+  if(!is.null(v_s_ubicacion)){
+    dt_data <- dt_data[ ubicacion %in%  v_s_ubicacion ]
+  }
   return(dt_data)
   
   
@@ -144,15 +162,15 @@ filterSpecific <- function(dt_data, v_values, s_col){
   
 }
 
-dataWithMissingToDatatable <- function(dt_data){
+dataToDatatable <- function(dt_data){
   dt_data_local <- copy(dt_data)
   dt_data_local[ tipo_institucion == "UNIVERSIDAD",  tipo_institucion := "Universidad"] 
   dt_data_local[ tipo_institucion == "INSTITUTO",  tipo_institucion := "Instituto"] 
   dt_data_local[ tipo_gestion == "PUBLICA",  tipo_gestion := "Pública"] 
   dt_data_local[ tipo_gestion == "PRIVADA",  tipo_gestion := "Privada"] 
   
-  v_s_cols <- c( "carrera", "institucion", "tipo_institucion","tipo_gestion","rango_costo","ingreso_promedio")
-  v_s_new_cols <- c( "Carrera", "Institución", "Tipo institución", "Tipo gestión", "Rango costo", "Ingreso promedio") 
+  v_s_cols <- c(  "institucion", "carrera","ubicacion", "tipo_institucion","tipo_gestion","rango_costo","ingreso_promedio")
+  v_s_new_cols <- c( "Institución","Carrera",  "Ubicación","Tipo institución", "Tipo gestión", "Rango costo", "Ingreso promedio") 
   setnames(dt_data_local, v_s_cols, v_s_new_cols)
   return(dt_data_local)
 }
@@ -177,4 +195,35 @@ getDataTableOptions <- function(){
   )
   
   return(l_dattab_options)
+}
+
+
+getDataSourceInformation <- function(){
+  tagList(
+    tags$p("Oferta educativa"),
+    tags$p( "
+is.na(rango_costo ) & tipo_gestion == 'PUBLICA' , rango_costo :='0'
+Fuente: 
+    MINEDU - DIGESUTPA - Sistema de Recojo de Información
+  Información del 2014
+  
+  Notas:
+    - La información presentada en este portal fue reportada por cada institución educativa, de acuerdo con lo solicitado mediante los documentos: Oficio N°057-2014-MINEDU/DIGESUTP remitido el 30 de setiembre del 2014, Oficio Múltiple N°007-2015-MINEDU/VMGP-DIGESUTPA remitido el 13 de abril del 2015, Oficio Múltiple N°003-2015-MINEDU/VMGP-DIGESU, remitido el 27 de mayo del 2015.
+  - La información publicada considera lo reportado a diciembre del 2015.
+  - De presentarse alguna duda o consulta por parte de las instituciones educativas respecto al reporte de información, comunicarse al correo electrónico ofertaeducativa@minedu.gob.pe o a la central (01) 615-5855.
+  - De acuerdo a los comunicados emitidos por la Superintendencia Nacional de Educación Superior Universitaria – SUNEDU el 27/12/2016 y el 22/01/2017, además de la Resolución de Superintendencia N° 0014-2017-SUNEDU, se ha actualizado la información de la oferta educativa, eliminando las carreras que no cuentan con autorización. Para ver la lista de carreras retiradas del portal da clic aquí.
+  
+  Ingreso promedio
+  Fuente:
+    MTPE - OGETIC - OE- Planilla Electrónica 2015.
+  Información al 52% de los trabajadores: sector privado (69%) y sector público (35%).
+
+Notas:
+  - Se considera la remuneración bruta promedio antes de los descuentos de ley.
+- Las remuneraciones han sido calculadas considerando a los trabajadores del sector privado y del sector público (regímenes D.L. Nº 728 y D.L. Nº1057)
+- Se considera jóvenes a los trabajadores de 18 a 29 años.
+- Se considera solo a las combinaciones de familias de carreras e instituciones con 25 casos a más.
+- Se considera solo a los trabajadores con jornada laboral completa.
+- Se excluyen a los jóvenes con remuneraciones mayores al percentil 98 según familia de carreras."))
+  
 }

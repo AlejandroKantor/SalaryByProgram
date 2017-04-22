@@ -10,15 +10,17 @@ library(shinyBS)
 load("./data/output/DtData.RData")
 source("./functions.R")
 v_s_ges_choices <- c("Pública", "Privada")
+v_s_ubic <- dt_data[ , unique(ubicacion)]
+v_s_ubic <- v_s_ubic[ order(v_s_ubic)]
 body <- dashboardBody(
   fluidRow(
     column( width = 8,
             box(
-              height = "500px",
+              height = "540px",
               width = NULL,
               h3("Ingreso mensual por carrera y costo*"),
-              plotlyOutput("plot"), 
-              h6("* solo incluye casos que tienen datos de ingreso promedio y de costos")
+              plotlyOutput("plot", height = "420px"), 
+              h6("* solo incluye casos que tienen datos de ingreso promedio y de costos. Lista completa en 'Tabla completa de carreras'.")
             ),  
             box(
               width = NULL,
@@ -42,7 +44,11 @@ body <- dashboardBody(
     
     box(
       width = 4,
-      h4("Filtrar por intitución y carrera"),
+      h4("Filtrar por ubicación, intitución y carrera"),
+      selectInput(inputId = "v_s_ubicacion", label = "Ubicación",
+                  choices = v_s_ubic,
+                  selected = NULL,
+                  multiple = TRUE),
       uiOutput("select_inst"),
       uiOutput("select_car")
     ) ,
@@ -53,13 +59,16 @@ body <- dashboardBody(
     box(
       width = 4,
       h4("Fuentes y definiciones"),
-      actionButton("fuentDef", "Ver fuentes y definiciones")
+      actionButton("fuentDef", "Ver fuentes y definiciones"),
+      br(),
+      br(),
+      a("Fuente original: http://www.ponteencarrera.pe/", href = "http://www.ponteencarrera.pe/", target="_blank")
     ),
     
     bsModal("missingTable", "Carreras sin ingreso promedio o costo", "tabBut", size = "large",
             dataTableOutput("formated_table")),
     bsModal("fuenteDefiniciones", "Fuentes y definiciones", "fuentDef", size = "large",
-            p("Información de fuentes"))
+            getDataSourceInformation())
     
   )
 )
@@ -101,7 +110,7 @@ server <- function(input, output) {
   
   
   output$formated_table <- shiny::renderDataTable({
-    dt_data_formated_local <- dataWithMissingToDatatable( dt_data_formated)
+    dt_data_formated_local <- dataToDatatable( dt_data_formated)
     
     return(dt_data_formated_local)
   }, options = getDataTableOptions())

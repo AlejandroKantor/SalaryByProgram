@@ -2,7 +2,7 @@ data/
 .DS_store
 .Rproj.user/
 .Rhistory
-salaryEducationTest.Rproj
+*.Rproj
 .Rproj.user
 .Rproj.user/
 rsconnect/

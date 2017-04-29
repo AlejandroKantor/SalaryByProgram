@@ -12,7 +12,7 @@ source("./functions.R")
 v_s_ges_choices <- c("Pública", "Privada")
 v_s_ubic <- dt_data[ , unique(ubicacion)]
 v_s_ubic <- v_s_ubic[ order(v_s_ubic)]
-body <- dashboardBody(
+ui <- fluidPage(theme = "http://resultados.pe/assets/css/styles_feeling_responsive.css",
   fluidRow(
     column( width = 8,
             box(
@@ -20,7 +20,7 @@ body <- dashboardBody(
               width = NULL,
               h3("Ingreso mensual por carrera y costo*"),
               plotlyOutput("plot", height = "420px"), 
-              h6("* solo incluye casos que tienen datos de ingreso promedio y de costos. Lista completa en 'Tabla completa de carreras'.")
+              p("* solo incluye casos que tienen datos de ingreso promedio y de costos. Lista completa en 'Tabla completa de carreras'.")
             ),  
             box(
               width = NULL,
@@ -72,12 +72,12 @@ body <- dashboardBody(
     
   )
 )
-
-ui <- dashboardPage(
-  dashboardHeader(disable = TRUE),
-  dashboardSidebar(disable = TRUE),
-  body
-)
+# 
+# ui <- dashboardPage(
+#   dashboardHeader(disable = TRUE),
+#   dashboardSidebar(disable = TRUE),
+#   body
+# )
 
 
 server <- function(input, output) {

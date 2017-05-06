@@ -42,7 +42,7 @@ ui <- fluidPage(theme = "http://resultados.pe/assets/css/styles_feeling_responsi
                             actionButton("fuentDef", "Ver fuentes y definiciones"),
                             br(),
                             br(),
-                            a("Fuente original: http://www.ponteencarrera.pe/", href = "http://www.ponteencarrera.pe/", target="_blank")
+                            a("Fuente original: ponteencarrera.pe/", href = "http://www.ponteencarrera.pe/", target="_blank")
                           )
                           
                   ),

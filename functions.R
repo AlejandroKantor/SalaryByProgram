@@ -202,30 +202,35 @@ getDataTableOptions <- function(){
 
 getDataSourceInformation <- function(){
   tagList(
-    tags$p("Oferta educativa"),
-    tags$p( "
-is.na(rango_costo ) & tipo_gestion == 'PUBLICA' , rango_costo :='0'
-Fuente: 
-    MINEDU - DIGESUTPA - Sistema de Recojo de Información
-  Información del 2014
-  
-  Notas:
-    - La información presentada en este portal fue reportada por cada institución educativa, de acuerdo con lo solicitado mediante los documentos: Oficio N°057-2014-MINEDU/DIGESUTP remitido el 30 de setiembre del 2014, Oficio Múltiple N°007-2015-MINEDU/VMGP-DIGESUTPA remitido el 13 de abril del 2015, Oficio Múltiple N°003-2015-MINEDU/VMGP-DIGESU, remitido el 27 de mayo del 2015.
-  - La información publicada considera lo reportado a diciembre del 2015.
-  - De presentarse alguna duda o consulta por parte de las instituciones educativas respecto al reporte de información, comunicarse al correo electrónico ofertaeducativa@minedu.gob.pe o a la central (01) 615-5855.
-  - De acuerdo a los comunicados emitidos por la Superintendencia Nacional de Educación Superior Universitaria – SUNEDU el 27/12/2016 y el 22/01/2017, además de la Resolución de Superintendencia N° 0014-2017-SUNEDU, se ha actualizado la información de la oferta educativa, eliminando las carreras que no cuentan con autorización. Para ver la lista de carreras retiradas del portal da clic aquí.
-  
-  Ingreso promedio
-  Fuente:
-    MTPE - OGETIC - OE- Planilla Electrónica 2015.
-  Información al 52% de los trabajadores: sector privado (69%) y sector público (35%).
-
-Notas:
-  - Se considera la remuneración bruta promedio antes de los descuentos de ley.
-- Las remuneraciones han sido calculadas considerando a los trabajadores del sector privado y del sector público (regímenes D.L. Nº 728 y D.L. Nº1057)
-- Se considera jóvenes a los trabajadores de 18 a 29 años.
-- Se considera solo a las combinaciones de familias de carreras e instituciones con 25 casos a más.
-- Se considera solo a los trabajadores con jornada laboral completa.
-- Se excluyen a los jóvenes con remuneraciones mayores al percentil 98 según familia de carreras."))
+    tags$p("Todos los datos provienen de la fuente oficial del gobierno ", a("ponteencarrera.pe/.", href = "http://www.ponteencarrera.pe/", target="_blank"),  
+           "No obstante, para obtener información oficial de los programas, por favor consultar con la institución educativa.",
+           br(),
+           "Para los programas públicos sin información de costo se ha asumido que su costo es de S/ 0."),
+    tags$p("A continuación se cita las fuentes y definiciones detalladas en" , a("ponteencarrera.pe/", href = "http://www.ponteencarrera.pe/", target="_blank") ),
+    tags$blockquote(
+      tags$h4("Oferta educativa"),
+      tags$b("Fuente: "), tags$br(),
+      "MINEDU - DIGESUTPA - Sistema de Recojo de Información", 
+      tags$br(),
+      "Información del 2014 ",
+      tags$br(),
+      tags$b("Notas: "),
+      tags$ul(
+        tags$li("La información presentada en este portal fue reportada por cada institución educativa, de acuerdo con lo solicitado mediante los documentos: Oficio N°057-2014-MINEDU/DIGESUTP remitido el 30 de setiembre del 2014, Oficio Múltiple N°007-2015-MINEDU/VMGP-DIGESUTPA remitido el 13 de abril del 2015, Oficio Múltiple N°003-2015-MINEDU/VMGP-DIGESU, remitido el 27 de mayo del 2015."),
+        tags$li("La información publicada considera lo reportado a diciembre del 2015."),
+        tags$li("De presentarse alguna duda o consulta por parte de las instituciones educativas respecto al reporte de información, comunicarse al correo electrónico ofertaeducativa@minedu.gob.pe o a la central (01) 615-5855."),
+        tags$li("De acuerdo a los comunicados emitidos por la Superintendencia Nacional de Educación Superior Universitaria – SUNEDU el 27/12/2016 y el 22/01/2017, además de la Resolución de Superintendencia N° 0014-2017-SUNEDU, se ha actualizado la información de la oferta educativa, eliminando las carreras que no cuentan con autorización. Para ver la lista de carreras retiradas del portal da clic aquí.")),
+      tags$h4("Ingreso promedio"),
+      tags$b("Fuente: "),tags$br(),
+      "MTPE - OGETIC - OE- Planilla Electrónica 2015.",tags$br(),
+      "Información al 52% de los trabajadores: sector privado (69%) y sector público (35%).",tags$br(),
+      tags$b("Notas:"),
+      tags$ul(
+        tags$li("Se considera la remuneración bruta promedio antes de los descuentos de ley."),
+        tags$li("Las remuneraciones han sido calculadas considerando a los trabajadores del sector privado y del sector público (regímenes D.L. Nº 728 y D.L. Nº1057)"),
+        tags$li("Se considera jóvenes a los trabajadores de 18 a 29 años."),
+        tags$li("Se considera solo a las combinaciones de familias de carreras e instituciones con 25 casos a más."),
+        tags$li("Se considera solo a los trabajadores con jornada laboral completa."),
+        tags$li("Se excluyen a los jóvenes con remuneraciones mayores al percentil 98 según familia de carreras."))))
   
 }

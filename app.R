@@ -13,64 +13,55 @@ v_s_ges_choices <- c("Pública", "Privada")
 v_s_ubic <- dt_data[ , unique(ubicacion)]
 v_s_ubic <- v_s_ubic[ order(v_s_ubic)]
 ui <- fluidPage(theme = "http://resultados.pe/assets/css/styles_feeling_responsive.css",
-  fluidRow(
-    column( width = 8,
-            box(
-              height = "540px",
-              width = NULL,
-              h3("Ingreso mensual por carrera y costo*"),
-              plotlyOutput("plot", height = "420px"), 
-              p("* solo incluye casos que tienen datos de ingreso promedio y de costos. Lista completa en 'Tabla completa de carreras'.")
-            ),  
-            box(
-              width = NULL,
-              h4("Filtrar por costo, tipo institución y tipo de gestión"),
-              column( width = 4, 
-                      radioButtons(inputId = "s_cost_type", label = "Costo",choices = c("min", "max"))),
-              column( width = 4,  
-                      checkboxGroupInput(inputId = "v_s_tipo_ges", label = "Tipo de gestión" ,
-                                         choices = v_s_ges_choices, selected = v_s_ges_choices)),
-              column( width = 4,       
-                      checkboxGroupInput(inputId = "v_s_tipo_inst", 
-                                         label = "Tipo de instución",
-                                         choices = c("Universidad","Instituto"),
-                                         selected = "Universidad")
-              )
-              
-            )
-            
-    ),
-    
-    
-    box(
-      width = 4,
-      h4("Filtrar por ubicación, intitución y carrera"),
-      selectInput(inputId = "v_s_ubicacion", label = "Ubicación",
-                  choices = v_s_ubic,
-                  selected = NULL,
-                  multiple = TRUE),
-      uiOutput("select_inst"),
-      uiOutput("select_car")
-    ) ,
-    box(
-      width = 4,
-      h4("Tabla completa de carreras"),
-      actionButton("tabBut", "Ver carreras")),
-    box(
-      width = 4,
-      h4("Fuentes y definiciones"),
-      actionButton("fuentDef", "Ver fuentes y definiciones"),
-      br(),
-      br(),
-      a("Fuente original: http://www.ponteencarrera.pe/", href = "http://www.ponteencarrera.pe/", target="_blank")
-    ),
-    
-    bsModal("missingTable", "Carreras sin ingreso promedio o costo", "tabBut", size = "large",
-            dataTableOutput("formated_table")),
-    bsModal("fuenteDefiniciones", "Fuentes y definiciones", "fuentDef", size = "large",
-            getDataSourceInformation())
-    
-  )
+                fluidRow(
+                  column( width = 3,
+                          box(
+                            width = NULL,
+                            h4("Filtros"),
+                            radioButtons(inputId = "s_cost_type", label = "Costo",choices = c("min", "max")),
+                            checkboxGroupInput(inputId = "v_s_tipo_ges", label = "Tipo de gestión" ,
+                                               choices = v_s_ges_choices, selected = v_s_ges_choices),
+                            checkboxGroupInput(inputId = "v_s_tipo_inst", 
+                                               label = "Tipo de instución",
+                                               choices = c("Universidad","Instituto"),
+                                               selected = "Universidad") ,
+                            selectInput(inputId = "v_s_ubicacion", label = "Ubicación",
+                                        choices = v_s_ubic,
+                                        selected = NULL,
+                                        multiple = TRUE),
+                            uiOutput("select_inst"),
+                            uiOutput("select_car")
+                          ),
+                          box(
+                            width = NULL,
+                            h4("Tabla completa de carreras"),
+                            actionButton("tabBut", "Ver carreras")),
+                          box(
+                            width = NULL,
+                            h4("Fuentes y definiciones"),
+                            actionButton("fuentDef", "Ver fuentes y definiciones"),
+                            br(),
+                            br(),
+                            a("Fuente original: http://www.ponteencarrera.pe/", href = "http://www.ponteencarrera.pe/", target="_blank")
+                          )
+                          
+                  ),
+                  column( width = 9,
+                          box(
+                            height = "540px",
+                            width = NULL,
+                            h3("Ingreso mensual por carrera y costo*"),
+                            plotlyOutput("plot", height = "420px"), 
+                            tags$sub("* solo incluye casos que tienen datos de ingreso promedio y de costos. Lista completa en 'Tabla completa de carreras'.")
+                          )
+                  ),
+                  
+                  bsModal("missingTable", "Carreras sin ingreso promedio o costo", "tabBut", size = "large",
+                          dataTableOutput("formated_table")),
+                  bsModal("fuenteDefiniciones", "Fuentes y definiciones", "fuentDef", size = "large",
+                          getDataSourceInformation())
+                  
+                )
 )
 # 
 # ui <- dashboardPage(

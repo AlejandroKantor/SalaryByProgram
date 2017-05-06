@@ -5,7 +5,6 @@ library(shinydashboard)
 library(plotly)
 library(stringi)
 library(shinyBS)
-#library(DT)
 
 load("./data/output/DtData.RData")
 source("./functions.R")
@@ -17,7 +16,7 @@ ui <- fluidPage(theme = "http://resultados.pe/assets/css/styles_feeling_responsi
                   column( width = 3,
                           box(
                             width = NULL,
-                            h4("Filtros"),
+                            h3("Filtros"),
                             radioButtons(inputId = "s_cost_type", label = "Costo",choices = c("min", "max")),
                             checkboxGroupInput(inputId = "v_s_tipo_ges", label = "Tipo de gestión" ,
                                                choices = v_s_ges_choices, selected = v_s_ges_choices),
@@ -34,11 +33,11 @@ ui <- fluidPage(theme = "http://resultados.pe/assets/css/styles_feeling_responsi
                           ),
                           box(
                             width = NULL,
-                            h4("Tabla completa de carreras"),
+                            h3("Tabla completa de carreras"),
                             actionButton("tabBut", "Ver carreras")),
                           box(
                             width = NULL,
-                            h4("Fuentes y definiciones"),
+                            h3("Fuentes y definiciones"),
                             actionButton("fuentDef", "Ver fuentes y definiciones"),
                             br(),
                             br(),

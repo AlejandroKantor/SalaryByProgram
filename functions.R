@@ -86,8 +86,10 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min"){
                              split = ~factor(categoria),
                              text = ~text_detalle,
                              hoverinfo = "text")
-  p_costo_ingreso <- p_costo_ingreso %>% layout( xaxis = list(  title = s_x_axis, rangemode="tozero"),
-                                                 yaxis = list(  title = "Ingreso promedio", rangemode="tozero"),
+  p_costo_ingreso <- p_costo_ingreso %>% layout( xaxis = list(  title = s_x_axis, rangemode="tozero",
+                                                                tickformat = ","),
+                                                 yaxis = list(  title = "Ingreso promedio", rangemode="tozero",
+                                                                tickformat =','),
                                                  plot_bgcolor= "#fdfdfd",
                                                  paper_bgcolor  ="#fdfdfd" ,
                                                    legend = list(y = -0.3, orientation = 'h'),

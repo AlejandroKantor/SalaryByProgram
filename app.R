@@ -55,10 +55,17 @@ ui <- fluidPage(theme = "http://resultados.pe/assets/css/styles_feeling_responsi
                           )
                   ),
                   
-                  bsModal("missingTable", "Carreras sin ingreso promedio o costo", "tabBut", size = "large",
+                  bsModal("missingTable", "Tabla completa de carreras", "tabBut", size = "large",
                           dataTableOutput("formated_table")),
                   bsModal("fuenteDefiniciones", "Fuentes y definiciones", "fuentDef", size = "large",
-                          getDataSourceInformation())
+                          getDataSourceInformation()),
+                  tags$head(tags$style(HTML('
+
+                                            .modal-lg {
+                                            width: 90%;
+                                            
+                                            }
+                                            ')))
                   
                 )
 )

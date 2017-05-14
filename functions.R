@@ -92,7 +92,7 @@ makeCostIncomeGraph <- function(dt_data, s_cost_type = "min"){
                                                                 tickformat =','),
                                                  plot_bgcolor= "#fdfdfd",
                                                  paper_bgcolor  ="#fdfdfd" ,
-                                                   legend = list(y = -0.3, orientation = 'h'),
+                                                   legend = list(y = -0.2, orientation = 'h'),
                                                  hovermode='closest'
   )
   p_costo_ingreso

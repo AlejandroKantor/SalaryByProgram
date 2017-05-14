@@ -47,10 +47,10 @@ ui <- fluidPage(theme = "http://resultados.pe/assets/css/styles_feeling_responsi
                   ),
                   column( width = 9,
                           box(
-                            height = "540px",
+                            height = "600px",
                             width = NULL,
                             h3("Ingreso mensual por carrera y costo*"),
-                            plotlyOutput("plot", height = "420px"), 
+                            plotlyOutput("plot", height = "480px"), 
                             tags$sub("* solo incluye casos que tienen datos de ingreso promedio y de costos. Lista completa en 'Tabla completa de carreras'.")
                           )
                   ),
